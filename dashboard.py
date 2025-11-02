@@ -1,18 +1,4 @@
 # dashboard.py
-# FİNAL SÜRÜM v5.0 (TÜBİTAK Finalist Sürümü - ÖNGÖRÜSEL ANALİZ)
-#
-# DEĞİŞİKLİKLER (v5.0):
-# 1. YENİ (Fikir 3 - Tahminleme): [ 🔮 FİYAT TAHMİNLEMESİ ] adında 4. ana sekme eklendi.
-#    - 'prophet' (Meta/Facebook kütüphanesi) import edildi.
-#    - 'get_price_forecast' adında, zaman serisi modelini eğiten ve
-#      gelecek 7 günü tahmin eden yeni bir cache'li fonksiyon eklendi.
-#    - 'display_forecasting_tab' adında, bu tahmini Plotly grafiği ile
-#      görselleştiren yeni bir UI fonksiyonu eklendi.
-#    - Bu, projeyi "Raporlama" seviyesinden "Öngörü (Forecasting)" seviyesine taşır.
-#
-# (v4.2'nin tüm özellikleri korundu: v4.1 Yönetici Revizyonları,
-#  %10 Eşik, Renkli Tablo, Hata Raporlama, Tarih Filtresi,
-#  Basit Gün Grafiği, 3 Strateji, Yenile Butonu)
 
 import streamlit as st
 import pandas as pd
@@ -69,7 +55,7 @@ def setup_page():
 
 def inject_css():
     """Özel CSS stillerini sayfaya enjekte eder."""
-    # CSS (Değişiklik yok)
+    # CSS
     st.markdown("""
     <style>
         .big-metric {
@@ -351,9 +337,8 @@ def calculate_strategy_dataframe(df: pd.DataFrame, strateji_mod: str, kur_usd_tl
 
     return df_calc, hedef_aciklama
 
-
 # =============================================================================
-# 5. GÖSTERGE PANELİ (DASHBOARD) BİLEŞENLERİ (v4.2 REFAKTÖR)
+# 5. GÖSTERGE PANELİ (DASHBOARD) BİLEŞENLERİ
 # =============================================================================
 
 # -----------------------------------------------------------------------------
@@ -467,7 +452,6 @@ def display_summary_metrics(df: pd.DataFrame, strateji: str, strateji_mod: str, 
         gunluk_ortalama = (toplam_fazlalik - toplam_kayip) / df['checkin'].nunique() if df[
                                                                                             'checkin'].nunique() > 0 else 0
 
-    # ! (v4.1 - Talep 1): Projeksiyonlar geri eklendi
     benzersiz_gunler = df['checkin'].nunique()
     st.info(f"""
     💡 **Tahmini Projeksiyonlar ({strateji}):**
@@ -566,7 +550,6 @@ def display_heatmap(df: pd.DataFrame, strateji_mod: str):
         "💡 **Isı Haritası Yorumu:** Koyu renkler, o otelin o tarihte seçilen stratejiye göre en fazla saptığı yerleri gösterir.")
 
 
-# ! (v4.1 - Talep 6): Kafa karıştırıcı Box Plot yerine basit Bar Chart
 def display_day_of_week_analysis(df: pd.DataFrame, strateji_mod: str):
     """Haftanın günlerine göre fiyat farklarını analiz eden bir BASİT ÇUBUK GRAFİK çizer."""
     if not PLOTLY_AVAILABLE: return
@@ -644,7 +627,7 @@ def display_overview_tab(df_analiz: pd.DataFrame, strateji: str, strateji_mod: s
 # 5.2. STRATEJİ ÖNERİLERİ SEKMESİ
 # -----------------------------------------------------------------------------
 
-# ! (v4.1 - Talep 4): 'st.data_editor' yerine 'st.dataframe' + Styler
+# ! 'st.data_editor' yerine 'st.dataframe' + Style eklemesi gerçekleşti
 def display_styled_analysis_table(df: pd.DataFrame, strateji: str, strateji_mod: str):
     """TAB 1: Rezervasyon Bazlı Analiz sekmesini 'st.dataframe' (renkli) ile gösterir."""
     st.subheader(f"📊 Rezervasyon Bazlı Analiz ({strateji})")
@@ -700,8 +683,6 @@ def display_styled_analysis_table(df: pd.DataFrame, strateji: str, strateji_mod:
         height=500
     )
 
-
-# ! (v4.1 - Talep 2, 3): %10 eşiği, 'ilk 10' limiti kaldırıldı, karakter hatası düzeltildi
 def display_recommendations_tab(df: pd.DataFrame, strateji: str, strateji_mod: str, kur_usd_tl: float,
                                 kur_eur_tl: float, kur_gbp_tl: float):
     """TAB 2: Strateji Önerileri sekmesini gösterir."""
@@ -802,8 +783,6 @@ def display_data_table_tab(df: pd.DataFrame, strateji_mod: str, secilen_otel: st
         mime="text/csv"
     )
 
-
-# ! (v4.1 - Talep 7): Tarih aralığı filtresi eklendi
 def display_strategy_tab(df_analiz: pd.DataFrame, strateji: str, strateji_mod: str, hedef_aciklama: str,
                          kur_usd_tl: float,
                          kur_eur_tl: float, kur_gbp_tl: float, secilen_otel: str):
@@ -886,7 +865,6 @@ def get_health_data(df_tr: pd.DataFrame, df_us: pd.DataFrame, df_de: pd.DataFram
     df_health['source_note'] = df_health['source_note'].fillna('Bilinmiyor')
     return df_health
 
-
 def display_raw_data_section(df_tr: pd.DataFrame, df_us: pd.DataFrame, df_de: pd.DataFrame, df_uk: pd.DataFrame):
     """Ham veritabanı verilerini bir checkbox ardında gösterir."""
     st.subheader("🔧 Ham Veritabanı Verileri")
@@ -919,8 +897,6 @@ def display_raw_data_section(df_tr: pd.DataFrame, df_us: pd.DataFrame, df_de: pd
         else:
             st.error("UK verisi yüklenemedi veya boş.")
 
-
-# ! (v4.1 - Talep 5): 'Sistem Sağlığı' sekmesi revize edildi
 def display_health_tab(df_tr: pd.DataFrame, df_us: pd.DataFrame, df_de: pd.DataFrame, df_uk: pd.DataFrame):
     """Ana 'Sistem Sağlığı' sekmesinin içeriğini yönetir."""
 
@@ -1051,8 +1027,6 @@ def display_health_tab(df_tr: pd.DataFrame, df_us: pd.DataFrame, df_de: pd.DataF
     st.divider()
     display_raw_data_section(df_tr, df_us, df_de, df_uk)
 
-
-# ! YENİ (v5.0): Fikir 3 - Fiyat Tahminlemesi Sekmesi
 # -----------------------------------------------------------------------------
 # 5.4. FİYAT TAHMİNLEMESİ SEKMESİ
 # -----------------------------------------------------------------------------
@@ -1069,7 +1043,7 @@ def get_price_forecast(df_otel: pd.DataFrame, days_to_forecast: int) -> Optional
 
     try:
         # 1. Veriyi Prophet formatına hazırla (ds, y)
-        # Tahminleme için en stabil olan 'Pazar Ortalaması'nı kullanalım
+        # Tahminleme için en stabil olan Pazar Ortalaması
         df_prophet = df_otel[['checkin', 'mean_fiyat_tl']].copy()
         df_prophet = df_prophet.rename(columns={'checkin': 'ds', 'mean_fiyat_tl': 'y'})
 
@@ -1081,7 +1055,7 @@ def get_price_forecast(df_otel: pd.DataFrame, days_to_forecast: int) -> Optional
             return None
 
         # 2. Modeli Kur ve Eğit
-        # Sadece haftalık sezonsallığı etkinleştir (verimiz ~30 gün)
+        # Sadece haftalık sezonsallığı etkinleştir
         model = Prophet(
             weekly_seasonality=True,
             daily_seasonality=False,
@@ -1099,11 +1073,6 @@ def get_price_forecast(df_otel: pd.DataFrame, days_to_forecast: int) -> Optional
         st.error(f"Fiyat tahminleme modelinde hata oluştu: {e}")
         return None
 
-
-# ! GÜNCELLEME (v5.1 - Hata Düzeltmesi): TypeError: Timestamp + int
-# ! GÜNCELLEME (v5.2 - Hata Düzeltmesi): TypeError: int + datetime.date
-# ! GÜNCELLEME (v5.4 - Nihai Düzeltme v2): 'add_vline' Typo Düzeltmesi
-# (v5.3'teki mantık doğruydu, ancak fonksiyonda 'li' yazım hatası vardı)
 def display_forecasting_tab(df_analiz: pd.DataFrame, secilen_otel: str):
     """Ana 'Fiyat Tahminlemesi' sekmesinin içeriğini yönetir."""
 
@@ -1156,7 +1125,7 @@ def display_forecasting_tab(df_analiz: pd.DataFrame, secilen_otel: str):
         y=forecast_data['yhat_lower'],
         mode='lines',
         line=dict(color='rgba(66, 165, 245, 0.3)'),
-        fill='tonexty',  # Aradaki alanı boya
+        fill='tonexty',
         name='Güven Aralığı (Alt)',
     ))
 
@@ -1181,10 +1150,6 @@ def display_forecasting_tab(df_analiz: pd.DataFrame, secilen_otel: str):
     # 4. Tahmin başlangıç çizgisi
     last_known_date = df_past['checkin'].max()
 
-    # ! DÜZELTME (v5.3 - Nihai): Hata veren 'add_vline' ve 'add_annotation' ayrıldı
-
-    # Adım 1: Çizgiyi çiz (Metinsiz, bu sayede hata vermez)
-    # Plotly'e 'Timestamp' objesi veriyoruz, string veya date değil.
     fig.add_vline(
         x=last_known_date,
         line_width=2,
@@ -1192,19 +1157,17 @@ def display_forecasting_tab(df_analiz: pd.DataFrame, secilen_otel: str):
         line_color="yellow"
     )
 
-    # Adım 2: Metni 'add_annotation' ile manuel olarak, güvenli bir yere ekle
-    # Grafikteki en yüksek Y değerini bul (tahmin veya gerçekleşen)
     y_pos = max(forecast_data['yhat_upper'].max(), df_past['mean_fiyat_tl'].max())
 
     fig.add_annotation(
-        x=last_known_date,  # X pozisyonu çizgiyle aynı
-        y=y_pos,  # Y pozisyonu grafiğin en üstü
-        yref="y",  # y koordinatını kullan
+        x=last_known_date,
+        y=y_pos,
+        yref="y",
         text="Tahmin Başlangıcı",
         font=dict(color="yellow", size=12),
-        showarrow=False,  # Ok gösterme
-        yanchor="bottom",  # Metni Y pozisyonunun üstüne yerleştir
-        yshift=5  # 5 piksel yukarı kaydır
+        showarrow=False,
+        yanchor="bottom",
+        yshift=5
     )
 
     fig.update_layout(
@@ -1234,7 +1197,6 @@ def display_about_section():
     """Hakkında bölümünü bir expander içinde gösterir."""
     st.divider()
     with st.expander("ℹ️ Sistem Hakkında Bilgi"):
-        # ! v5.0: "Öngörüsel Analiz" eklendi
         st.markdown("""
         ### 🎯 Projenin Amacı
         Bu sistem, otel işletmelerinin farklı dijital pazarlardaki fiyatlandırma stratejilerini
@@ -1266,7 +1228,6 @@ def display_about_section():
 def display_footer():
     """Sayfanın en altına bir altbilgi (footer) ekler."""
     st.divider()
-    # ! GÜNCELLEME (v4.2 / v5.0): Teknik versiyon notları kaldırıldı
     st.markdown("""
     <div style='text-align: center; color: #888; padding: 20px;'>
         <p style='font-size: 1.2em; font-weight: bold;'>Otel Gelir Yönetimi ve Fiyat Optimizasyon Sistemi</p>
@@ -1287,7 +1248,6 @@ def main():
     # 1. Sayfa Ayarları ve Başlık
     setup_page()
     inject_css()
-    # ! GÜNCELLEME (v4.2 / v5.0): Başlık stili güncellendi
     st.title("🏨 Otel Gelir Yönetimi ve Fiyat Optimizasyon Sistemi")
     st.markdown("""
     <div class='info-box'>
@@ -1342,13 +1302,13 @@ def main():
         df_filtrelenmis, strateji_mod, kur_usd_tl, kur_eur_tl, kur_gbp_tl
     )
 
-    # 5. Dashboard Gösterimi (YENİ 4 SEKME MİMARİSİ)
+    # 5. Dashboard Gösterimi
 
     tab_genel, tab_strateji, tab_saglik, tab_tahmin = st.tabs([
         "📈 Genel Bakış & KPI'lar",
         "💡 Strateji Önerileri",
         "🩺 Sistem Sağlığı & Ham Veri",
-        "🔮 Fiyat Tahminlemesi (Prophet)"  # ! YENİ (v5.0)
+        "🔮 Fiyat Tahminlemesi (Prophet)"
     ])
 
     with tab_genel:
@@ -1361,11 +1321,9 @@ def main():
         )
 
     with tab_saglik:
-        # Sistem Sağlığı ham, birleşmemiş veriyi kullanır
         display_health_tab(df_tr, df_us, df_de, df_uk)
 
     with tab_tahmin:
-        # Tahminleme, filtrelenmiş ve hesaplanmış 'df_analiz'i kullanır
         display_forecasting_tab(df_analiz, secilen_otel)
 
     # 6. Ek Bilgi ve Footer
@@ -1378,4 +1336,5 @@ if __name__ == "__main__":
         st.error("Kritik Hata: Plotly kütüphanesi bulunamadı. Dashboard başlatılamıyor.")
         st.info("Lütfen terminalden 'pip install plotly' komutunu çalıştırın.")
     else:
+
         main()
